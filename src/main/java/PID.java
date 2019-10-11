@@ -7,6 +7,7 @@ public class PID {
     private double pFactor = 0;
     private double iFactor = 0;
     private double dFactor = 0;
+    private double MAX_ERRORSUM = 1000;
 
     public void setRequired(double r) {
         this.required = r;
@@ -35,7 +36,10 @@ public class PID {
     }
 
     public double getIntegral() {
-        this.errorSum += this.error;
+        double newSum = this.errorSum + this.error;
+        if(!(newSum > MAX_ERRORSUM || newSum < -MAX_ERRORSUM)){
+            this.errorSum = newSum;
+        }
         return this.iFactor * this.errorSum;
     }
 

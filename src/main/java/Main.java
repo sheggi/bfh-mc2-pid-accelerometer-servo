@@ -35,7 +35,8 @@ public class Main {
 
         PID pid = new PID();
 
-        pid.setPID(0.1, 0.00015, 2);
+        pid.setPID(9.5, 0.1, 3);
+        //pid.setPID(0.7, 0.02, 1);
         pid.setRequired(0);
 
 
@@ -47,7 +48,7 @@ public class Main {
             try {
                 // Get current acceleration
                 BrickletAccelerometer.Acceleration acceleration = accelerometer.getAcceleration();
-                double y = acceleration.y;
+                double y = acceleration.y / 10;
                 double potiRel = (poti.getAnalogValue() - 2047) / 10;
 
                 if(DEBUG) System.out.println("Acceleration [X]: \t" + acceleration.x / 1000.0 + " g \t [Y]: " + acceleration.y / 1000.0 + " g \t [Z]: " + acceleration.z / 1000.0 + " g");
@@ -59,13 +60,19 @@ public class Main {
                 double pos = servo.getPosition(SERVO_NR);
                 double newPos = pos - steuer; // invert correction to counter act influence
 
-                newPos += potiRel; // konstante störgrösse
+                //newPos += potiRel; // konstante störgrösse
 
                 servo.setPosition(SERVO_NR, (short) newPos);
 
                 if(true) System.out.printf("Error %f\tCorrection %f\tErrSum %f\tStör %f%n", pid.getError(), pid.getOutput(), pid.getErrorSum(), potiRel);
 
                 if(DEBUG) System.out.printf("Error %f\tSteuer %f\tPos %f\tNewPos %f\tP %f\tI %f\tD %f\tErrSum %f%n", pid.getError(), steuer, pos, newPos,pid.getProportional(), pid.getIntegral(), pid.getDifferencial(), pid.getErrorSum());
+
+                try{
+                    Thread.sleep(20);
+                }catch(Exception e){
+
+                }
 
             } catch (TimeoutException $ex) {
                 System.out.println('.');
