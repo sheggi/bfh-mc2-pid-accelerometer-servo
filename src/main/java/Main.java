@@ -30,12 +30,17 @@ public class Main {
 
         servo.enable(SERVO_NR);
         servo.setAcceleration(SERVO_NR, 65535);
+        servo.setOutputVoltage(6000);
 
         // config pid
 
         PID pid = new PID();
 
-        pid.setPID(9.5, 0.1, 3);
+        double P = 20;
+        double I = 0;
+        double D = 12;
+
+        pid.setPID(P, I, D);
         //pid.setPID(0.7, 0.02, 1);
         pid.setRequired(0);
 
@@ -51,6 +56,9 @@ public class Main {
                 double y = acceleration.y / 10;
                 double potiRel = (poti.getAnalogValue() - 2047) / 10;
 
+                D = poti.getPosition() / 2;
+                pid.setPID(P, I, D);
+
                 if(DEBUG) System.out.println("Acceleration [X]: \t" + acceleration.x / 1000.0 + " g \t [Y]: " + acceleration.y / 1000.0 + " g \t [Z]: " + acceleration.z / 1000.0 + " g");
 
                 pid.setInput(y);
@@ -64,7 +72,7 @@ public class Main {
 
                 servo.setPosition(SERVO_NR, (short) newPos);
 
-                if(true) System.out.printf("Error %f\tCorrection %f\tErrSum %f\tStör %f%n", pid.getError(), pid.getOutput(), pid.getErrorSum(), potiRel);
+                if(true) System.out.printf("%f Error %f\tCorrection %f\tErrSum %f\tStör %f%n", D, pid.getError(), pid.getOutput(), pid.getErrorSum(), potiRel);
 
                 if(DEBUG) System.out.printf("Error %f\tSteuer %f\tPos %f\tNewPos %f\tP %f\tI %f\tD %f\tErrSum %f%n", pid.getError(), steuer, pos, newPos,pid.getProportional(), pid.getIntegral(), pid.getDifferencial(), pid.getErrorSum());
 
